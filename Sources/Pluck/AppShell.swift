@@ -48,12 +48,8 @@ final class AppShell: NSObject, NSWindowDelegate {
             if currentDelay > 0, currentDelay != self.engine.holdDelayMs {
                 self.engine.holdDelayMs = currentDelay
             }
-            if let outcome = await self.selectionReader.read(at: point) {
-                _ = outcome
-                let hudEnabled = UserDefaults.standard.object(forKey: "pluck.hudEnabled") as? Bool ?? true
-                if hudEnabled {
-                    self.hud.show(near: point)
-                }
+            if await self.selectionReader.read(at: point) != nil {
+                self.hud.show(near: point)
             }
         }
     }

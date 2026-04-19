@@ -1,13 +1,14 @@
-// swift-tools-version:6.0
+// swift-tools-version:6.2
 import PackageDescription
 
 let package = Package(
     name: "Pluck",
     platforms: [
-        // Runtime floor is macOS 26 (set in Info.plist's LSMinimumSystemVersion).
-        // The SwiftPM platform floor stays at the highest enum value currently
-        // exposed; none of the source requires a newer availability gate.
-        .macOS(.v15),
+        // Runtime floor is macOS 26 (matches Info.plist's LSMinimumSystemVersion).
+        // The HUD uses Liquid Glass (`.glassEffect`, `GlassEffectContainer`),
+        // which requires macOS 26; the SwiftPM platform is raised to match so
+        // the source doesn't need `@available` guards throughout.
+        .macOS(.v26),
     ],
     products: [
         .executable(name: "Pluck", targets: ["Pluck"]),

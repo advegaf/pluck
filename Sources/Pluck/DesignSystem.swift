@@ -5,27 +5,27 @@ import AppKit
 /// (generated via `npx getdesign@latest add apple`). Flat namespaces so call
 /// sites stay terse: `Palette.accent`, `Typography.body()`, `Motion.easeOut`.
 
+/// Structural colors come from macOS semantic NSColor values so the app
+/// inherits Apple's own light/dark palette exactly — same grays you see in
+/// System Settings, Notes, Reminders, Mail. The only hardcoded chromatic
+/// value is Apple Blue for accent (DESIGN.md §2), since `controlAccentColor`
+/// follows the user's system accent picker and we want brand consistency.
 enum Palette {
-    static let background   = Color(nsColor: .pluckDynamic(light: .rgb(0xf5, 0xf5, 0xf7),
-                                                           dark:  .rgb(0x00, 0x00, 0x00)))
-    static let surface      = Color(nsColor: .pluckDynamic(light: .white,
-                                                           dark:  .rgb(0x1d, 0x1d, 0x1f)))
-    static let surfaceHover = Color(nsColor: .pluckDynamic(light: .rgb(0x00, 0x00, 0x00, alpha: 0.04),
-                                                           dark:  .rgb(0xff, 0xff, 0xff, alpha: 0.06)))
-    static let separator    = Color(nsColor: .pluckDynamic(light: .rgb(0x00, 0x00, 0x00, alpha: 0.08),
-                                                           dark:  .rgb(0xff, 0xff, 0xff, alpha: 0.10)))
-    static let textPrimary  = Color(nsColor: .pluckDynamic(light: .rgb(0x1d, 0x1d, 0x1f),
-                                                           dark:  .rgb(0xf5, 0xf5, 0xf7)))
-    static let textSecondary = Color(nsColor: .pluckDynamic(light: .rgb(0x00, 0x00, 0x00, alpha: 0.80),
-                                                            dark:  .rgb(0xff, 0xff, 0xff, alpha: 0.72)))
-    static let textTertiary = Color(nsColor: .pluckDynamic(light: .rgb(0x00, 0x00, 0x00, alpha: 0.48),
-                                                           dark:  .rgb(0xff, 0xff, 0xff, alpha: 0.48)))
-    static let accent       = Color(nsColor: .pluckDynamic(light: .rgb(0x00, 0x71, 0xe3),
-                                                           dark:  .rgb(0x29, 0x97, 0xff)))
-    /// Used as-is for focus rings — DESIGN.md calls out `#0071e3` for focus
-    /// regardless of appearance.
-    static let focusRing    = Color(red: 0x00/255.0, green: 0x71/255.0, blue: 0xe3/255.0)
-    static let onAccent     = Color.white
+    static let background    = Color(nsColor: .windowBackgroundColor)
+    static let surface       = Color(nsColor: .controlBackgroundColor)
+    static let surfaceHover  = Color(nsColor: .pluckDynamic(
+        light: .rgb(0x00, 0x00, 0x00, alpha: 0.04),
+        dark:  .rgb(0xff, 0xff, 0xff, alpha: 0.06)))
+    static let separator     = Color(nsColor: .separatorColor)
+    static let textPrimary   = Color(nsColor: .labelColor)
+    static let textSecondary = Color(nsColor: .secondaryLabelColor)
+    static let textTertiary  = Color(nsColor: .tertiaryLabelColor)
+    static let accent        = Color(nsColor: .pluckDynamic(
+        light: .rgb(0x00, 0x71, 0xe3),
+        dark:  .rgb(0x29, 0x97, 0xff)))
+    /// DESIGN.md pins focus rings at `#0071e3` regardless of appearance.
+    static let focusRing     = Color(red: 0x00/255.0, green: 0x71/255.0, blue: 0xe3/255.0)
+    static let onAccent      = Color.white
 }
 
 enum Metrics {

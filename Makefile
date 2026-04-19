@@ -13,7 +13,10 @@ BINARY_SRC    := .build/$(CONFIG)/$(APP_NAME)
 CODESIGN_IDENTITY ?= -
 # For a notarized release: set to your Developer ID Application identity.
 
-.PHONY: all build bundle sign run test clean
+INSTALL_DIR   := /Applications
+INSTALLED_APP := $(INSTALL_DIR)/$(APP_NAME).app
+
+.PHONY: all build bundle sign run test clean install uninstall reset-permissions
 
 all: bundle
 
@@ -41,3 +44,20 @@ test:
 clean:
 	swift package clean
 	rm -rf $(BUILD_DIR)
+
+# Drop the running dev copy, replace /Applications/Pluck.app with the
+# fresh build, and launch the installed copy.
+install: bundle
+	@pkill -TERM $(APP_NAME) 2>/dev/null || true
+	@sleep 1
+	ditto $(APP_BUNDLE) $(INSTALLED_APP)
+	open $(INSTALLED_APP)
+
+uninstall:
+	@pkill -TERM $(APP_NAME) 2>/dev/null || true
+	rm -rf $(INSTALLED_APP)
+
+# Clears Accessibility + Input Monitoring grants for this bundle. Launch
+# the app after this to re-run onboarding.
+reset-permissions:
+	tccutil reset All md.getdesign.pluck

@@ -35,7 +35,6 @@ struct PrefsContent: View {
 
 private struct GeneralTab: View {
     @AppStorage("pluck.holdDelayMs") private var holdDelayMs: Int = 150
-    @AppStorage("pluck.hudEnabled")  private var hudEnabled: Bool = true
 
     var body: some View {
         PrefsSection("Gesture") {
@@ -48,16 +47,10 @@ private struct GeneralTab: View {
                     ), in: 100...400, step: 10)
                     .frame(width: 160)
                     Text("\(holdDelayMs) ms")
-                        .font(Typography.mono())
+                        .font(Typography.body().monospacedDigit())
                         .foregroundStyle(Palette.textSecondary)
                         .frame(width: 62, alignment: .trailing)
                 }
-            }
-        }
-
-        PrefsSection("Feedback") {
-            PrefsRow("Show \u{201C}Copied\u{201D} pill near cursor") {
-                Toggle("", isOn: $hudEnabled).labelsHidden()
             }
         }
 

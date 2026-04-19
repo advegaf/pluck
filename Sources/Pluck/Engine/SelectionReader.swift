@@ -1,90 +1,42 @@
 import AppKit
 
 struct SelectionOutcome: Equatable, Sendable {
-    enum Source: Equatable, Sendable { case ax, fallback }
     var text: String
-    var source: Source
 }
 
-protocol FrontmostAppProvider: Sendable {
-    func frontmostBundleID() -> String?
-}
-
-final class SystemFrontmostAppProvider: FrontmostAppProvider, @unchecked Sendable {
-    func frontmostBundleID() -> String? {
-        NSWorkspace.shared.frontmostApplication?.bundleIdentifier
-    }
-}
-
-/// Returns the selected text at a screen point, preferring the AX API and
-/// falling back to a synthesized Cmd+C with clipboard restore. Honors the
-/// blocklist before either path.
+/// Reads the selected text under a screen point via AX and writes it to the
+/// clipboard. AX-only by design: any AX outcome short of "here is a non-empty
+/// selection" is a silent no-op. Previously we fell back to a synthesized
+/// Cmd+C when AX reported no selection, which made every click on a non-text
+/// element (Finder desktop, buttons, icons, most of macOS) emit NSBeep.
 final class SelectionReader: @unchecked Sendable {
     private let ax: AXSelectionSource
     private let pasteboard: Pasteboard
-    private let keys: KeystrokeSender
-    private let frontmost: FrontmostAppProvider
     private let blocklist: Blocklist
-
-    /// How long to poll the pasteboard for a changeCount bump after Cmd+C.
-    var fallbackTimeout: TimeInterval = 0.12
-    var fallbackPollStep: TimeInterval = 0.005
 
     init(
         ax: AXSelectionSource = SystemAXSelectionSource(),
         pasteboard: Pasteboard = SystemPasteboard(),
-        keys: KeystrokeSender = SystemKeystrokeSender(),
-        frontmost: FrontmostAppProvider = SystemFrontmostAppProvider(),
         blocklist: Blocklist
     ) {
         self.ax = ax
         self.pasteboard = pasteboard
-        self.keys = keys
-        self.frontmost = frontmost
         self.blocklist = blocklist
     }
 
     func read(at screenPoint: CGPoint) async -> SelectionOutcome? {
-        // Run AX off the main run loop: `AXUIElementCopyElementAtPosition`
-        // is synchronous and can block for seconds on an unresponsive
-        // target app, which would starve the CGEventTap that shares the
-        // main run loop. AX APIs are thread-safe.
+        // `AXUIElementCopyElementAtPosition` is synchronous and can block
+        // for seconds on an unresponsive target app; run it off the main
+        // run loop so a slow AX call never starves the CGEventTap.
         let ax = self.ax
-        let axRead = await Task.detached(priority: .userInitiated) {
+        let hit = await Task.detached(priority: .userInitiated) {
             ax.readSelection(at: screenPoint)
         }.value
 
-        let bundleID = axRead?.bundleID ?? frontmost.frontmostBundleID()
-        if let bundleID, blocklist.contains(bundleID) {
-            return nil
-        }
+        guard case let .selection(text, bundleID) = hit else { return nil }
+        if let bundleID, blocklist.contains(bundleID) { return nil }
 
-        if let axRead, !axRead.text.isEmpty {
-            pasteboard.write(axRead.text)
-            return SelectionOutcome(text: axRead.text, source: .ax)
-        }
-
-        return await fallbackCopy()
-    }
-
-    private func fallbackCopy() async -> SelectionOutcome? {
-        let snapshot = pasteboard.snapshot()
-        let beforeChange = pasteboard.changeCount
-        keys.sendCopy()
-
-        let deadline = Date().addingTimeInterval(fallbackTimeout)
-        while Date() < deadline {
-            if pasteboard.changeCount != beforeChange { break }
-            let step = UInt64(fallbackPollStep * 1_000_000_000)
-            try? await Task.sleep(nanoseconds: step)
-        }
-
-        if pasteboard.changeCount != beforeChange,
-           let text = pasteboard.readString(), !text.isEmpty {
-            return SelectionOutcome(text: text, source: .fallback)
-        }
-
-        pasteboard.restore(snapshot)
-        return nil
+        pasteboard.write(text)
+        return SelectionOutcome(text: text)
     }
 }

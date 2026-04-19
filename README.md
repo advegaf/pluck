@@ -3,9 +3,9 @@
 Hold-click to copy, anywhere on macOS 26.
 
 Select text in any app, press down on the selection, keep the mouse still for
-~150 ms, release. The text is now on your clipboard. A tiny "✓ Copied" pill
-confirms near the cursor. The click's native behavior (deselect, caret move)
-proceeds unchanged.
+~150 ms, release. The text is now on your clipboard. A Liquid Glass "✓ Copied"
+pill morphs in at the bottom-center of the screen. The click's native behavior
+(deselect, caret move) proceeds unchanged.
 
 No modifier key. No floating UI. Just a gesture.
 
@@ -18,7 +18,8 @@ managers. Pluck is neither.
 
 ## Install
 
-Requires macOS 14+ (built against macOS 26 / Xcode 26).
+Requires macOS 26+ (the HUD uses Apple's Liquid Glass, which is macOS 26 only).
+Built with Xcode 26.
 
 ```sh
 make bundle
@@ -39,8 +40,8 @@ The first launch walks you through two system permissions:
 3. If you release in under 150 ms, Pluck stays out of the way — you were
    clicking normally.
 4. If you hold still for 150 ms+, Pluck reads the selected text via the
-   Accessibility API, writes it to the clipboard, and shows a pill near the
-   cursor.
+   Accessibility API, writes it to the clipboard, and morphs a Liquid Glass
+   pill in at the bottom-center of the active screen.
 5. Your click finishes naturally: selection clears, caret moves.
 
 If the app doesn't expose its selection via the Accessibility API (many
@@ -53,7 +54,6 @@ clipboard otherwise.
 Menu bar → **Preferences…**
 
 - **Hold delay** — 100–400 ms, default 150 ms.
-- **HUD** — toggle the "Copied" pill.
 - **Launch at login** — via `SMAppService`.
 - **Blocklist** — apps where Pluck stays silent. Ships with sane defaults
   (Figma, Sketch, Photoshop, Illustrator, Blender, Unity, Unreal, Excel,
