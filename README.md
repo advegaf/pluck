@@ -21,9 +21,19 @@ managers. Pluck is neither.
 Requires macOS 26+ (the HUD uses Apple's Liquid Glass, which is macOS 26 only).
 Built with Xcode 26.
 
+### Users
+
+Download `Pluck-<version>.dmg` from Releases, open it, and drag Pluck
+into Applications. The DMG is signed with a Developer ID and notarized
+by Apple — no Gatekeeper warning.
+
+### Developers
+
 ```sh
-make bundle
-open build/Pluck.app
+make install              # build, adhoc-sign, copy to /Applications, launch
+make run                  # build and open from the build dir
+make full-reset           # wipe TCC + UserDefaults + bundles, reinstall
+make dmg                  # signed + notarized DMG release
 ```
 
 The first launch walks you through two system permissions:

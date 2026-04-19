@@ -218,10 +218,7 @@ private struct BlocklistRow: View {
 private struct AboutTab: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Image("AppIcon", bundle: .module)
-                .resizable()
-                .interpolation(.high)
-                .frame(width: 64, height: 64)
+            AppIconView(size: 64)
                 .padding(.top, 4)
 
             VStack(alignment: .leading, spacing: 4) {

@@ -9,6 +9,8 @@ Package.resolved
 .netrc
 *.dmg
 *.zip
+build/dmg-background.png
+build/dmg-background.tiff
 
 # Finder propagates a zero-byte "Icon<CR>" marker whenever an enclosing
 # folder has a custom icon. Covered by the character-class pattern below.

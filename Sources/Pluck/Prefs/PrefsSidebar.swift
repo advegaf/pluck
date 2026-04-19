@@ -27,10 +27,7 @@ struct PrefsSidebar: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
             HStack(spacing: 10) {
-                Image("AppIcon", bundle: .module)
-                    .resizable()
-                    .interpolation(.high)
-                    .frame(width: 32, height: 32)
+                AppIconView(size: 32)
                 Text("Pluck")
                     .font(.system(size: 22, weight: .semibold))
                     .tracking(Tracking.title)
