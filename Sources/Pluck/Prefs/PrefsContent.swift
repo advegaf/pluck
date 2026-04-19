@@ -218,9 +218,10 @@ private struct BlocklistRow: View {
 private struct AboutTab: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Image(systemName: "scissors")
-                .font(.system(size: 44, weight: .regular))
-                .foregroundStyle(Palette.textSecondary)
+            Image("AppIcon", bundle: .module)
+                .resizable()
+                .interpolation(.high)
+                .frame(width: 64, height: 64)
                 .padding(.top, 4)
 
             VStack(alignment: .leading, spacing: 4) {

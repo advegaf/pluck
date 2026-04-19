@@ -8,6 +8,8 @@ MACOS_DIR     := $(CONTENTS)/MacOS
 RESOURCES     := $(CONTENTS)/Resources
 INFO_PLIST_SRC := Sources/Pluck/Resources/Info.plist
 ENTITLEMENTS  := Sources/Pluck/Resources/entitlements.plist
+ICON_PNG_SRC  := Sources/Pluck/Resources/AppIcon.png
+ICON_ICNS_OUT := $(RESOURCES)/AppIcon.icns
 BINARY_SRC    := .build/$(CONFIG)/$(APP_NAME)
 
 CODESIGN_IDENTITY ?= -
@@ -27,6 +29,7 @@ bundle: build
 	@mkdir -p $(MACOS_DIR) $(RESOURCES)
 	cp $(BINARY_SRC) $(MACOS_DIR)/$(APP_NAME)
 	cp $(INFO_PLIST_SRC) $(CONTENTS)/Info.plist
+	Scripts/gen-icns.sh $(ICON_PNG_SRC) $(ICON_ICNS_OUT)
 	@$(MAKE) sign
 
 sign:

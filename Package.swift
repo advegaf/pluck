@@ -30,6 +30,9 @@ let package = Package(
                 "Onboarding/Icon\r",
                 "Resources/Icon\r",
             ],
+            resources: [
+                .process("Resources/AppIcon.png"),
+            ],
             swiftSettings: [
                 .enableUpcomingFeature("StrictConcurrency"),
                 .unsafeFlags(["-parse-as-library"]),

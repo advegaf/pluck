@@ -26,13 +26,19 @@ struct PrefsSidebar: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text("Pluck")
-                .font(Typography.bodyEmphasized())
-                .tracking(Tracking.body)
-                .foregroundStyle(Palette.textPrimary)
-                .padding(.horizontal, 16)
-                .padding(.top, 18)
-                .padding(.bottom, 14)
+            HStack(spacing: 10) {
+                Image("AppIcon", bundle: .module)
+                    .resizable()
+                    .interpolation(.high)
+                    .frame(width: 32, height: 32)
+                Text("Pluck")
+                    .font(.system(size: 22, weight: .semibold))
+                    .tracking(Tracking.title)
+                    .foregroundStyle(Palette.textPrimary)
+            }
+            .padding(.horizontal, 10)
+            .padding(.top, 16)
+            .padding(.bottom, 14)
 
             ForEach(PrefsTab.allCases) { tab in
                 PrefsSidebarRow(tab: tab, isSelected: tab == selected) {
