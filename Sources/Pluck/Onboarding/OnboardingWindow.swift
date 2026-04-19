@@ -38,69 +38,78 @@ struct OnboardingView: View {
     var onFinish: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
-            VStack(alignment: .leading, spacing: 6) {
-                Text("Welcome to Pluck")
-                    .font(.system(size: 28, weight: .semibold, design: .rounded))
-                Text("Select text, hold a click, and it's copied. Grant the two permissions below to get started.")
-                    .font(.system(size: 13))
-                    .foregroundStyle(.secondary)
-            }
+        ZStack {
+            Palette.background.ignoresSafeArea()
 
-            VStack(spacing: 12) {
-                permissionRow(
-                    title: "Accessibility",
-                    subtitle: "Lets Pluck read the selected text from the app you click in.",
-                    granted: state.accessibilityGranted,
-                    action: { PermissionChecks.openSettings(for: .accessibility) }
-                )
-                permissionRow(
-                    title: "Input Monitoring",
-                    subtitle: "Lets Pluck detect the hold-click gesture without intercepting your clicks.",
-                    granted: state.inputMonitoringGranted,
-                    action: { PermissionChecks.openSettings(for: .inputMonitoring) }
-                )
-            }
+            VStack(spacing: 0) {
+                Spacer().frame(height: 56)
 
-            Spacer(minLength: 0)
+                VStack(spacing: 10) {
+                    Text("Welcome to Pluck")
+                        .font(Typography.hero())
+                        .tracking(Tracking.hero)
+                        .foregroundStyle(Palette.textPrimary)
+                        .multilineTextAlignment(.center)
+                    Text("Grant these two permissions once. Then hold-click any selection to copy.")
+                        .font(Typography.subtitle())
+                        .foregroundStyle(Palette.textSecondary)
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: 480)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
 
-            HStack {
-                Spacer()
-                Button("Done") { onFinish() }
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.large)
+                Spacer().frame(height: 36)
+
+                VStack(spacing: 12) {
+                    PermissionCard(
+                        title: "Accessibility",
+                        subtitle: "Lets Pluck read the selected text from the app you click in.",
+                        granted: state.accessibilityGranted,
+                        action: { PermissionChecks.openSettings(for: .accessibility) }
+                    )
+                    PermissionCard(
+                        title: "Input Monitoring",
+                        subtitle: "Lets Pluck notice the hold-click gesture without intercepting your clicks.",
+                        granted: state.inputMonitoringGranted,
+                        action: { PermissionChecks.openSettings(for: .inputMonitoring) }
+                    )
+                }
+                .frame(maxWidth: 480)
+
+                Spacer(minLength: 0)
+
+                HStack {
+                    Button("Skip for now") { onFinish() }
+                        .buttonStyle(.pluckPress)
+                        .foregroundStyle(Palette.textTertiary)
+                        .font(Typography.body())
+
+                    Spacer()
+
+                    Button {
+                        onFinish()
+                    } label: {
+                        Text("Start using Pluck")
+                            .font(Typography.body())
+                            .padding(.horizontal, 18)
+                            .padding(.vertical, 9)
+                            .foregroundStyle(Palette.onAccent)
+                            .background(
+                                state.allGranted ? Palette.accent : Palette.accent.opacity(0.4),
+                                in: RoundedRectangle(cornerRadius: Metrics.chipRadius,
+                                                     style: .continuous)
+                            )
+                    }
+                    .buttonStyle(.pluckPress)
                     .disabled(!state.allGranted)
+                    .animation(Motion.easeOut, value: state.allGranted)
+                }
+                .padding(.top, 12)
             }
+            .padding(.horizontal, 48)
+            .padding(.bottom, 32)
         }
-        .padding(24)
-        .frame(width: 460, height: 340)
-    }
-
-    @ViewBuilder
-    private func permissionRow(
-        title: String,
-        subtitle: String,
-        granted: Bool,
-        action: @escaping () -> Void
-    ) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: granted ? "checkmark.circle.fill" : "circle")
-                .foregroundStyle(granted ? Color.accentColor : .secondary)
-                .font(.system(size: 18))
-                .padding(.top, 2)
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(.system(size: 14, weight: .semibold))
-                Text(subtitle).font(.system(size: 12)).foregroundStyle(.secondary)
-            }
-            Spacer()
-            Button("Open Settings…", action: action)
-                .buttonStyle(.bordered)
-                .disabled(granted)
-        }
-        .padding(12)
-        .background(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(Color.secondary.opacity(0.08))
-        )
+        .frame(width: Metrics.windowWidth, height: Metrics.windowHeight)
+        .tint(Palette.accent)
     }
 }

@@ -13,11 +13,13 @@ struct PluckApp: App {
 
         Settings {
             if let shell = appDelegate.shell {
-                PrefsView(blocklist: shell.blocklist)
+                PrefsChrome(blocklist: shell.blocklist)
             } else {
                 ProgressView()
+                    .frame(width: Metrics.windowWidth, height: Metrics.windowHeight)
             }
         }
+        .windowResizability(.contentSize)
     }
 }
 
