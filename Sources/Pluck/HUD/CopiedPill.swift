@@ -23,14 +23,14 @@ struct CopiedPill: View {
                 Image(systemName: "checkmark")
                     .font(.system(size: 11, weight: .semibold))
                     .opacity(isVisible ? 1 : 0)
-                    // Check appears at ~30% of the 400ms spring → 120ms in.
-                    .animation(.smooth(duration: 0.40).delay(isVisible ? 0.120 : 0), value: isVisible)
+                    // Check appears at ~30% of the 700ms spring → 210ms in.
+                    .animation(.smooth(duration: 0.70).delay(isVisible ? 0.210 : 0), value: isVisible)
                 Text(label)
                     .font(.system(size: 13, weight: .semibold))
                     .opacity(isVisible ? 1 : 0)
                     .fixedSize()
-                    // Label appears at ~60% → 240ms in.
-                    .animation(.smooth(duration: 0.40).delay(isVisible ? 0.240 : 0), value: isVisible)
+                    // Label appears at ~60% → 420ms in.
+                    .animation(.smooth(duration: 0.70).delay(isVisible ? 0.420 : 0), value: isVisible)
             }
             .padding(.horizontal, isVisible ? 12 : 0)
             .padding(.vertical, isVisible ? 7 : 0)
@@ -44,7 +44,7 @@ struct CopiedPill: View {
             .glassEffectID("pill", in: glassNamespace)
         }
         .foregroundStyle(.primary)
-        .animation(.smooth(duration: 0.40), value: isVisible)
+        .animation(.smooth(duration: 0.70), value: isVisible)
     }
 }
 

@@ -36,6 +36,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 private struct MenuContent: View {
     @State private var paused: Bool = false
+    @AppStorage("pluck.onboardingCompleted") private var onboardingCompleted: Bool = false
     var shell: AppShell
 
     var body: some View {
@@ -46,7 +47,9 @@ private struct MenuContent: View {
         Divider()
         SettingsLink { Text("Preferences…") }
             .keyboardShortcut(",")
-        Button("Show Onboarding…") { shell.showOnboarding() }
+        if !onboardingCompleted {
+            Button("Show Onboarding…") { shell.showOnboarding() }
+        }
         Divider()
         Button("About Pluck") { showAbout() }
         Button("Quit Pluck") { NSApp.terminate(nil) }

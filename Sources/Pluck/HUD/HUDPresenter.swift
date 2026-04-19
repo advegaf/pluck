@@ -33,10 +33,10 @@ final class HUDPresenter {
     private var dismissWork: DispatchWorkItem?
 
     /// Time the pill stays fully expanded before the reverse morph begins.
-    private let hold: TimeInterval = 0.300
+    private let hold: TimeInterval = 0.900
     /// Duration of the reverse spring — after this, orderOut the panel.
-    /// Matches the 400ms `.smooth` spring in `CopiedPill`.
-    private let exitDuration: TimeInterval = 0.400
+    /// Matches the 700ms `.smooth` spring in `CopiedPill`.
+    private let exitDuration: TimeInterval = 0.700
 
     /// `anchor` is used only to pick the screen the user is working on;
     /// the pill itself sits at bottom-center of that screen. Matches how

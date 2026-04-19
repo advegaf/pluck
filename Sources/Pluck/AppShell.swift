@@ -33,10 +33,26 @@ final class AppShell: NSObject, NSWindowDelegate {
         }
     }
 
+    /// Persisted in UserDefaults so onboarding reappears on relaunch until
+    /// the user has explicitly closed the window with both permissions
+    /// granted. Decouples "permissions are satisfied" from "user has seen
+    /// and confirmed the setup flow".
+    var onboardingCompleted: Bool {
+        get { UserDefaults.standard.bool(forKey: "pluck.onboardingCompleted") }
+        set { UserDefaults.standard.set(newValue, forKey: "pluck.onboardingCompleted") }
+    }
+
     func bootstrap() {
+        // Additive, not exclusive: engine starts whenever permissions are
+        // granted, AND onboarding opens when either permissions are missing
+        // OR the user has not yet confirmed setup. This makes the common
+        // quit-after-granting-Input-Monitoring → relaunch flow work: the
+        // engine is already live while the user clicks "Start using Pluck"
+        // one last time to close the loop.
         if onboardingState.allGranted {
             startEngineIfPossible()
-        } else {
+        }
+        if !onboardingState.allGranted || !onboardingCompleted {
             showOnboarding()
         }
     }
@@ -76,15 +92,17 @@ final class AppShell: NSObject, NSWindowDelegate {
         onboardingState.beginPolling()
     }
 
-    // Fires for any close path — red traffic light OR the "Done" button —
-    // so we always stop polling and (if both permissions are now granted)
-    // start the engine without requiring a relaunch.
+    // Fires for any close path — red traffic light, "Skip for now", or the
+    // "Start using Pluck" CTA — so we always stop polling and (if both
+    // permissions are now granted) start the engine AND mark onboarding
+    // confirmed. The grant is what matters; the specific button is cosmetic.
     func windowWillClose(_ notification: Notification) {
         guard let closing = notification.object as? NSWindow,
               closing === onboardingWindow else { return }
         onboardingState.stopPolling()
         onboardingWindow = nil
         if onboardingState.allGranted {
+            onboardingCompleted = true
             startEngineIfPossible()
         }
     }
