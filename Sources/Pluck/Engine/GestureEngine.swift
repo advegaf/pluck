@@ -73,6 +73,9 @@ final class GestureEngine {
     fileprivate func handle(type: CGEventType, location: CGPoint) {
         if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
             if let tap { CGEvent.tapEnable(tap: tap, enable: true) }
+            holdWork?.cancel()
+            holdWork = nil
+            machine.reset()
             return
         }
         guard !isPaused else { return }
@@ -83,7 +86,7 @@ final class GestureEngine {
         case .leftMouseUp:
             if let action = machine.onMouseUp() { apply(action) }
         case .leftMouseDragged:
-            if let action = machine.onMouseDragged() { apply(action) }
+            if let action = machine.onMouseDragged(to: location) { apply(action) }
         default:
             break
         }

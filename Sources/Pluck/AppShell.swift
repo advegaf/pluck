@@ -3,7 +3,7 @@ import SwiftUI
 
 @MainActor
 @Observable
-final class AppShell {
+final class AppShell: NSObject, NSWindowDelegate {
     let blocklist: Blocklist
     let engine: GestureEngine
     let selectionReader: SelectionReader
@@ -16,13 +16,14 @@ final class AppShell {
         set { engine.isPaused = newValue }
     }
 
-    init() {
+    override init() {
         let blocklist = Blocklist()
         self.blocklist = blocklist
         self.engine = GestureEngine()
         self.selectionReader = SelectionReader(blocklist: blocklist)
         self.hud = HUDPresenter()
         self.onboardingState = OnboardingState()
+        super.init()
 
         let storedDelay = UserDefaults.standard.integer(forKey: "pluck.holdDelayMs")
         engine.holdDelayMs = storedDelay == 0 ? 150 : storedDelay
@@ -65,20 +66,31 @@ final class AppShell {
         }
         let view = OnboardingView(state: onboardingState) { [weak self] in
             self?.onboardingWindow?.close()
-            self?.onboardingWindow = nil
-            self?.onboardingState.stopPolling()
-            self?.startEngineIfPossible()
         }
         let hosting = NSHostingController(rootView: view)
         let window = NSWindow(contentViewController: hosting)
         window.title = "Pluck"
         window.styleMask = [.titled, .closable]
         window.isReleasedWhenClosed = false
+        window.delegate = self
         window.center()
         window.makeKeyAndOrderFront(nil)
         NSApp.activate()
         onboardingWindow = window
         onboardingState.beginPolling()
+    }
+
+    // Fires for any close path — red traffic light OR the "Done" button —
+    // so we always stop polling and (if both permissions are now granted)
+    // start the engine without requiring a relaunch.
+    func windowWillClose(_ notification: Notification) {
+        guard let closing = notification.object as? NSWindow,
+              closing === onboardingWindow else { return }
+        onboardingState.stopPolling()
+        onboardingWindow = nil
+        if onboardingState.allGranted {
+            startEngineIfPossible()
+        }
     }
 
     func startEngineIfPossible() {

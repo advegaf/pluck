@@ -45,7 +45,15 @@ final class SelectionReader: @unchecked Sendable {
     }
 
     func read(at screenPoint: CGPoint) async -> SelectionOutcome? {
-        let axRead = ax.readSelection(at: screenPoint)
+        // Run AX off the main run loop: `AXUIElementCopyElementAtPosition`
+        // is synchronous and can block for seconds on an unresponsive
+        // target app, which would starve the CGEventTap that shares the
+        // main run loop. AX APIs are thread-safe.
+        let ax = self.ax
+        let axRead = await Task.detached(priority: .userInitiated) {
+            ax.readSelection(at: screenPoint)
+        }.value
+
         let bundleID = axRead?.bundleID ?? frontmost.frontmostBundleID()
         if let bundleID, blocklist.contains(bundleID) {
             return nil

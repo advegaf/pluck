@@ -4,7 +4,10 @@ import PackageDescription
 let package = Package(
     name: "Pluck",
     platforms: [
-        .macOS(.v14),
+        // Runtime floor is macOS 26 (set in Info.plist's LSMinimumSystemVersion).
+        // The SwiftPM platform floor stays at the highest enum value currently
+        // exposed; none of the source requires a newer availability gate.
+        .macOS(.v15),
     ],
     products: [
         .executable(name: "Pluck", targets: ["Pluck"]),
