@@ -1,0 +1,15 @@
+.DS_Store
+.build/
+build/
+*.xcodeproj/
+*.xcworkspace/
+Packages/
+Package.resolved
+.swiftpm/
+.netrc
+*.dmg
+*.zip
+
+# Finder propagates a zero-byte "Icon<CR>" marker whenever an enclosing
+# folder has a custom icon. Covered by the character-class pattern below.
+**/Icon[[:cntrl:]]
