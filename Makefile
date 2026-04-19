@@ -57,10 +57,15 @@ clean:
 	rm -rf $(BUILD_DIR)
 
 # Drop the running dev copy, replace /Applications/Pluck.app with the
-# fresh build, and launch the installed copy.
+# fresh build, and launch the installed copy. The explicit rm before
+# ditto is required: once a notarized+stapled bundle has been launched,
+# macOS attaches `com.apple.provenance` tracking to the on-disk files
+# and refuses in-place writes that change the signature (e.g. adhoc
+# overwriting Developer ID). Removing first sidesteps that.
 install: bundle
 	@pkill -TERM $(APP_NAME) 2>/dev/null || true
 	@sleep 1
+	rm -rf $(INSTALLED_APP)
 	ditto $(APP_BUNDLE) $(INSTALLED_APP)
 	open $(INSTALLED_APP)
 

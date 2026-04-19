@@ -75,30 +75,64 @@ tagline.draw(at: CGPoint(
     y: logicalSize.height - wordmarkSize.height - 46 - tagSize.height - 10
 ))
 
-// --- Drag arrow: subtle Apple-Blue chevron between icon drop targets -------
-// Post-process step positions Pluck.app at (220, 270) and Applications at
-// (440, 270). Draw a thin arrow centered between them at matching y.
-let arrowColor = NSColor(srgbRed: 0x00/255.0, green: 0x71/255.0, blue: 0xe3/255.0, alpha: 0.62)
-arrowColor.setStroke()
+// --- Drag arrow: tri-color gradient pulled from the app icon ----------------
+// Colors eyedropped from the scissors tile:
+//   red handle   #d8443b
+//   yellow handle #e6b93b
+//   blue handle  #2c61af
+// The arrow sits between the drop targets (Pluck.app at (220, 270) and
+// Applications at (440, 270) post-process) and flows red → yellow → blue
+// left-to-right so the last beat lands on the Applications target.
+let red    = NSColor(srgbRed: 0xd8/255.0, green: 0x44/255.0, blue: 0x3b/255.0, alpha: 0.95)
+let yellow = NSColor(srgbRed: 0xe6/255.0, green: 0xb9/255.0, blue: 0x3b/255.0, alpha: 0.95)
+let blue   = NSColor(srgbRed: 0x2c/255.0, green: 0x61/255.0, blue: 0xaf/255.0, alpha: 0.95)
 
-let arrowPath = NSBezierPath()
-// Arrow sits between (220, 270) and (440, 270) in the post-processed
-// bottom-left origin coordinate system. Our canvas is bottom-left too.
-let iconBaselineY: CGFloat = logicalSize.height - 270   // top-down → bottom-up flip
-let leftX: CGFloat = 220 + 48    // right edge of left icon (iconSize 96)
-let rightX: CGFloat = 440 - 48   // left edge of right icon
+let iconBaselineY: CGFloat = logicalSize.height - 270
+let leftX: CGFloat = 220 + 48     // right edge of left icon (iconSize 96)
+let rightX: CGFloat = 440 - 48    // left edge of right icon
 let midY: CGFloat = iconBaselineY
-let shaftLength: CGFloat = rightX - leftX - 24
+let shaftStartX: CGFloat = leftX + 12
+let shaftEndX:   CGFloat = rightX - 12
 
-arrowPath.lineWidth = 1.5
+// Build the arrow path: shaft + chevron head.
+let arrowPath = NSBezierPath()
+arrowPath.lineWidth = 2.2
 arrowPath.lineCapStyle = .round
-arrowPath.move(to: CGPoint(x: leftX + 12, y: midY))
-arrowPath.line(to: CGPoint(x: leftX + 12 + shaftLength, y: midY))
-// Chevron head
-arrowPath.move(to: CGPoint(x: leftX + 12 + shaftLength - 8, y: midY + 6))
-arrowPath.line(to: CGPoint(x: leftX + 12 + shaftLength, y: midY))
-arrowPath.line(to: CGPoint(x: leftX + 12 + shaftLength - 8, y: midY - 6))
-arrowPath.stroke()
+arrowPath.lineJoinStyle = .round
+arrowPath.move(to: CGPoint(x: shaftStartX, y: midY))
+arrowPath.line(to: CGPoint(x: shaftEndX, y: midY))
+arrowPath.move(to: CGPoint(x: shaftEndX - 9, y: midY + 7))
+arrowPath.line(to: CGPoint(x: shaftEndX, y: midY))
+arrowPath.line(to: CGPoint(x: shaftEndX - 9, y: midY - 7))
+
+// Clip to the stroked arrow path, then fill the clipped region with a
+// horizontal red→yellow→blue gradient. Smooth color flow across the
+// whole arrow — shaft AND chevron head.
+if let cg = NSGraphicsContext.current?.cgContext,
+   let gradient = CGGradient(
+        colorsSpace: CGColorSpace(name: CGColorSpace.sRGB),
+        colors: [red.cgColor, yellow.cgColor, blue.cgColor] as CFArray,
+        locations: [0.0, 0.5, 1.0]) {
+    let stroked = arrowPath.cgPath.copy(
+        strokingWithWidth: arrowPath.lineWidth,
+        lineCap: .round,
+        lineJoin: .round,
+        miterLimit: 10
+    )
+    cg.saveGState()
+    cg.addPath(stroked)
+    cg.clip()
+    cg.drawLinearGradient(
+        gradient,
+        start: CGPoint(x: shaftStartX, y: midY),
+        end:   CGPoint(x: shaftEndX,   y: midY),
+        options: []
+    )
+    cg.restoreGState()
+} else {
+    blue.setStroke()
+    arrowPath.stroke()
+}
 
 NSGraphicsContext.restoreGraphicsState()
 

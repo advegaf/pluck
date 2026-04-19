@@ -3,18 +3,30 @@ import AppKit
 
 /// Renders the app's own icon at the requested point size.
 ///
-/// Pulls from `NSApp.applicationIconImage`, which macOS seeds from
-/// `Contents/Resources/AppIcon.icns` via `CFBundleIconFile`. Single
-/// source of truth — no duplicate PNG needs shipping inside the bundle.
-/// NSImage picks the best-matching representation from the ICNS (16,
-/// 32, 64, 128, 256, 512, 1024 @1x and @2x) for the drawn size, so a
-/// 32pt render on a retina display draws the 64px rep, and a 64pt
-/// render draws the 128px rep — always pixel-perfect.
+/// Loads `AppIcon.icns` directly from the bundle rather than going
+/// through `NSApp.applicationIconImage`. On macOS 26 Tahoe, the latter
+/// can return an image with the OS's Dock-squircle treatment pre-applied
+/// — which looks like extra padding inside the view frame. Loading the
+/// ICNS file gives us the raw multi-resolution art as the user exported
+/// it, edge-to-edge within the frame.
+///
+/// NSImage picks the closest-size representation from the ICNS (16, 32,
+/// 64, 128, 256, 512, 1024 px) for the drawn size, so a 32pt frame on
+/// retina draws the 64px rep, a 64pt frame draws the 128px rep — always
+/// pixel-perfect.
 struct AppIconView: View {
     let size: CGFloat
 
+    private static let icon: NSImage = {
+        if let url = Bundle.main.url(forResource: "AppIcon", withExtension: "icns"),
+           let image = NSImage(contentsOf: url) {
+            return image
+        }
+        return NSApp.applicationIconImage
+    }()
+
     var body: some View {
-        Image(nsImage: NSApp.applicationIconImage)
+        Image(nsImage: Self.icon)
             .resizable()
             .interpolation(.high)
             .frame(width: size, height: size)
