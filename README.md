@@ -1,6 +1,10 @@
-# Pluck
+<p align="center">
+  <img src="docs/pluck-icon.png" width="160" alt="Pluck app icon" />
+</p>
 
-Hold-click to copy, anywhere on macOS 26.
+<h1 align="center">Pluck</h1>
+
+<p align="center">Hold-click to copy, anywhere on macOS 26.</p>
 
 Select text in any app, press down on the selection, keep the mouse still for
 ~150 ms, release. The text is now on your clipboard. A Liquid Glass "✓ Copied"
