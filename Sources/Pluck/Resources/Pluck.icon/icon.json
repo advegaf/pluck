@@ -1,0 +1,25 @@
+{
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "image-name" : "Pluck-Dark.png",
+          "name" : "Pluck",
+          "position" : {
+            "scale" : 1.0,
+            "translation-in-points" : [
+              0,
+              0
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

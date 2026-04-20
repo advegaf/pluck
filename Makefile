@@ -37,7 +37,14 @@ bundle: build
 	@mkdir -p $(MACOS_DIR) $(RESOURCES)
 	cp $(BINARY_SRC) $(MACOS_DIR)/$(APP_NAME)
 	cp $(INFO_PLIST_SRC) $(CONTENTS)/Info.plist
+	# Legacy .icns — fallback used by SwiftUI AppIconView and older macOS.
 	Scripts/gen-icns.sh $(ICON_ICNS_OUT)
+	# macOS 26 Icon Composer bundle. Referenced by CFBundleIconName,
+	# preferred by Finder/Dock on 26+, opts out of Liquid Glass templating.
+	rm -rf $(RESOURCES)/Pluck.icon
+	cp -R Sources/Pluck/Resources/Pluck.icon $(RESOURCES)/Pluck.icon
+	# Strip xattrs (codesign rejects Finder info on dragged-in assets).
+	xattr -rc $(APP_BUNDLE)
 	@$(MAKE) sign
 
 sign:

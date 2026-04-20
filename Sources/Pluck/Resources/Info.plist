@@ -10,6 +10,8 @@
     <string>Pluck</string>
     <key>CFBundleIconFile</key>
     <string>AppIcon</string>
+    <key>CFBundleIconName</key>
+    <string>Pluck</string>
     <key>CFBundleIdentifier</key>
     <string>md.getdesign.pluck</string>
     <key>CFBundleInfoDictionaryVersion</key>
