@@ -122,6 +122,14 @@ Tests/PluckTests/
 look of the HUD pill, preferences window, and onboarding. It's a spec for AI
 coding agents — it has no runtime role.
 
+## How I built it
+
+I built this with Claude Code and Codex working like a small team. One agent plans the work and
+writes a spec for each piece, subagents write the code from those specs, and the two tools review
+each other's changes. I approve the plan before any code gets written, I read every diff before
+it's committed, and nothing ships until the tests pass. Anything that touches security or user
+data I write or check line by line myself.
+
 ## License
 
 MIT. See [LICENSE](LICENSE).
