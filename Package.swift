@@ -20,15 +20,6 @@ let package = Package(
             exclude: [
                 "Resources/Info.plist",
                 "Resources/entitlements.plist",
-                // Finder propagates a zero-byte "Icon\r" marker file when
-                // the enclosing folder has a custom icon. It has no role in
-                // the package.
-                "Icon\r",
-                "Engine/Icon\r",
-                "HUD/Icon\r",
-                "Prefs/Icon\r",
-                "Onboarding/Icon\r",
-                "Resources/Icon\r",
             ],
             swiftSettings: [
                 .enableUpcomingFeature("StrictConcurrency"),
@@ -38,8 +29,7 @@ let package = Package(
         .testTarget(
             name: "PluckTests",
             dependencies: ["Pluck"],
-            path: "Tests/PluckTests",
-            exclude: ["Icon\r"]
+            path: "Tests/PluckTests"
         ),
     ]
 )
