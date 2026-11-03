@@ -40,6 +40,11 @@ make full-reset           # wipe TCC + UserDefaults + bundles, reinstall
 make dmg                  # signed + notarized DMG release
 ```
 
+`make install` signs adhoc by default, and macOS then asks for the two
+permissions again after every rebuild. To keep them, sign with a stable
+identity: copy `local.mk.example` to `local.mk` and name a code-signing
+identity from your keychain (a self-signed one works).
+
 The first launch walks you through two system permissions:
 
 - **Accessibility** — so Pluck can read the selected text from the window you
