@@ -34,6 +34,18 @@ struct BlocklistTests {
         #expect(bl.contains("com.b"))
     }
 
+    @Test func defaultsBlockFinderByItsRealBundleID() {
+        let bl = Blocklist(defaults: freshDefaults(), key: "pluck.blocklist")
+        #expect(bl.contains("com.apple.finder"))
+    }
+
+    @Test func listStoredWithOldFinderEntryStillBlocksFinder() {
+        let defaults = freshDefaults()
+        defaults.set(["com.apple.Finder"], forKey: "pluck.blocklist")
+        let bl = Blocklist(defaults: defaults, key: "pluck.blocklist")
+        #expect(bl.contains("com.apple.finder"))
+    }
+
     @Test func resetToDefaultsRestoresCanonicalList() {
         let defaults = freshDefaults()
         defaults.set(["com.one"], forKey: "pluck.blocklist")
