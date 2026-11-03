@@ -58,10 +58,10 @@ The first launch walks you through two system permissions:
    pill in at the bottom-center of the active screen.
 5. Your click finishes naturally: selection clears, caret moves.
 
-If the app doesn't expose its selection via the Accessibility API (many
-Electron apps, some Chromium embeds), Pluck transparently synthesizes a
-Cmd+C, keeps the result if the clipboard changed, and restores the previous
-clipboard otherwise.
+Selection reading is AX-only. If the app doesn't expose its selection via
+the Accessibility API (many Electron apps, some Chromium embeds), Pluck
+does nothing: a synthesized Cmd+C fallback made every hold on a non-text
+element play the system beep, so it was removed.
 
 ## Configure
 
@@ -71,7 +71,7 @@ Menu bar → **Preferences…**
 - **Launch at login** — via `SMAppService`.
 - **Blocklist** — apps where Pluck stays silent. Ships with sane defaults
   (Figma, Sketch, Photoshop, Illustrator, Blender, Unity, Unreal, Excel,
-  Numbers, Finder, Xcode Interface Builder).
+  Numbers, Finder).
 
 ## Develop
 
@@ -89,21 +89,27 @@ Layout:
 Sources/Pluck/
   PluckApp.swift            # @main, MenuBarExtra + Settings scenes
   AppShell.swift            # wires engine → reader → HUD
+  AppIconView.swift
+  DesignSystem.swift
   Engine/
     GestureStateMachine.swift   # pure state machine (testable)
     GestureEngine.swift         # CGEventTap wrapper
     AXSelectionSource.swift     # reads kAXSelectedTextAttribute
     Pasteboard.swift            # NSPasteboard abstraction
-    KeystrokeSender.swift       # Cmd+C synthesis
-    SelectionReader.swift       # AX → Cmd+C fallback orchestration
+    SelectionReader.swift       # AX read → blocklist → clipboard
   HUD/
     CopiedPill.swift            # SwiftUI pill
     HUDGeometry.swift           # pure positioning math
     HUDPresenter.swift          # NSPanel lifecycle
   Prefs/
-    PrefsView.swift
     Blocklist.swift
+    PrefsChrome.swift
+    PrefsContent.swift
+    PrefsRow.swift
+    PrefsSection.swift
+    PrefsSidebar.swift
   Onboarding/
+    PermissionCard.swift
     PermissionChecks.swift
     OnboardingWindow.swift
   Resources/
