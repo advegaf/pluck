@@ -12,10 +12,16 @@ ICON_PNG_SRC  := Sources/Pluck/Resources/AppIcon.png
 ICON_ICNS_OUT := $(RESOURCES)/AppIcon.icns
 BINARY_SRC    := .build/$(CONFIG)/$(APP_NAME)
 
+# Machine-local overrides, not tracked (see local.mk.example). An adhoc
+# signature (`-`) identifies the app by its cdhash, so macOS forgets the
+# Accessibility and Input Monitoring grants after every rebuild; a stable
+# identity, even a self-signed one, keeps them.
+-include local.mk
+
 CODESIGN_IDENTITY ?= -
 # For a notarized release: set to your Developer ID Application identity.
 # `--timestamp` requires Apple's timestamp server, which adhoc (`-`) can't use.
-TIMESTAMP_FLAG := $(if $(filter -,$(CODESIGN_IDENTITY)),,--timestamp)
+TIMESTAMP_FLAG ?= $(if $(filter -,$(CODESIGN_IDENTITY)),,--timestamp)
 
 INSTALL_DIR   := /Applications
 INSTALLED_APP := $(INSTALL_DIR)/$(APP_NAME).app

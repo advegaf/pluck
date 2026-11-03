@@ -1,0 +1,7 @@
+# Copy to local.mk (untracked) to sign dev builds with a stable identity,
+# so macOS keeps Pluck's Accessibility and Input Monitoring grants across
+# rebuilds. Any code-signing identity in your keychain works, including a
+# self-signed certificate with the codeSigning extended key usage.
+CODESIGN_IDENTITY := Your Signing Identity
+# A self-signed identity cannot use Apple's timestamp server.
+TIMESTAMP_FLAG := --timestamp=none
