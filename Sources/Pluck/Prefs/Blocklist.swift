@@ -15,7 +15,7 @@ final class Blocklist: @unchecked Sendable {
         "com.epicgames.UnrealEditor",
         "com.microsoft.Excel",
         "com.apple.iWork.Numbers",
-        "com.apple.Finder",
+        "com.apple.finder",
     ]
 
     private let defaults: UserDefaults
@@ -38,8 +38,12 @@ final class Blocklist: @unchecked Sendable {
         }
     }
 
+    /// Bundle IDs are matched case-insensitively, as Launch Services does.
+    /// This also keeps lists stored before the default entry was fixed
+    /// ("com.apple.Finder", which never matched Finder's
+    /// "com.apple.finder") working.
     func contains(_ bundleID: String) -> Bool {
-        Set(bundleIDs).contains(bundleID)
+        bundleIDs.contains { $0.caseInsensitiveCompare(bundleID) == .orderedSame }
     }
 
     func add(_ bundleID: String) {
